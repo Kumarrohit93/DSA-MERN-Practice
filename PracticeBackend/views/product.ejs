@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Trendvault</h1>
+    <a href="/cart">Cart</a>
+    <% productData.forEach(data => { %>
+        <h2><%= data.title %></h2>
+        <p><%= data.description %></p>
+        <img src="<%= data.image %>" height="150" width="150" alt="<%= data.title %>">
+        <p><b>Price: </b><%= data.price %></p>
+        <a href="/cart-add/<%= data._id %>">
+            <button>Add to Cart</button>
+        </a>
+        <hr>
+   <% }) %>
+</body>
+</html>
