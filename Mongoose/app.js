@@ -15,53 +15,41 @@ main()
   .catch((err) => {
     console.log(err);
   });
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-const clientSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   name: {
     type: String,
+    required: true,
   },
   age: {
     type: Number,
+    min: 18,
+    max: 100,
+    required: true,
   },
   email: {
     type: String,
-  },
-  city: {
-    type: String,
-  },
-  role: {
-    type: String,
-  },
-  salary: {
-    type: Number,
-  },
-  isActive: {
-    type: String,
+    match: [/^\s+@\s+\.\s+$/, "Invaild email"],
+    required: true,
   },
 });
 
-const clients = mongoose.model("client", clientSchema);
+const user = mongoose.model("user", userSchema);
 
-// const storeData = async() => {
-//   const data = await clients.insertMany([
-//  {name:"Rohit", age:22, city:"Delhi", role:"user", salary:20000, isActive:true},
-//  {name:"Aman", age:25, city:"Mumbai", role:"admin", salary:40000, isActive:true},
-//  {name:"Neha", age:19, city:"Delhi", role:"user", salary:15000, isActive:false},
-//  {name:"Simran", age:28, city:"Pune", role:"user", salary:35000, isActive:true},
-//  {name:"Rahul", age:30, city:"Noida", role:"manager", salary:50000, isActive:true},
-//  {name:"Pooja", age:21, city:"Delhi", role:"user", salary:18000, isActive:false},
-//  {name:"Kunal", age:24, city:"Jaipur", role:"user", salary:22000, isActive:true},
-//  {name:"Ankit", age:27, city:"Mumbai", role:"admin", salary:45000, isActive:true}
-// ]);
+app.post("/getdata", async (req, res) => {
+  try {
+    const { name, age, email } = req.body;
+    const data = { name, age, email };
+    await user.save();
 
-// console.log("data is saveed in db!")
-// }
+    console.log(data);
+  } catch (err) {
+    console.log(err);
+  }
+});
 
-// storeData()
-
-const getData = async () => {
-  const data = await clients.countDocuments({city: "Jaipur"});
-  console.log(data);
-};
-
-getData();
+app.listen(port, () => {
+  console.log(`Server is listening at port ${port}`);
+});
