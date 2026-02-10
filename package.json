@@ -16,5 +16,14 @@
     "express": "^5.2.1",
     "mongoose": "^9.0.1",
     "path": "^0.12.7"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kumarrohit93/DSA-MERN-Practice.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Kumarrohit93/DSA-MERN-Practice/issues"
+  },
+  "homepage": "https://github.com/Kumarrohit93/DSA-MERN-Practice#readme"
 }

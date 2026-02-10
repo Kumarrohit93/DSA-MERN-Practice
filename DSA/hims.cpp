@@ -2,7 +2,7 @@
 using namespace std;
 
 int partition(int arr[], int s, int e) {
-    int paviot = arr[s];
+    int paviot = arcr[s];
 }
 
 void quickSort(int arr[], int e, int s){
