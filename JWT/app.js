@@ -7,10 +7,11 @@ const bcrypt = require("bcryptjs");
 const path = require("path");
 const dbUrl = "mongodb://127.0.0.1:27017/backendPractice";
 const ejsMate = require("ejs-mate");
-const AppError = require("./middleware/AppError.js");
+const {AppError} = require("./middleware/AppError.js");
 const jwt_secret = "123456788054654";
 const cookieParser = require("cookie-parser");
 const {protectByHeader, protectByCookie, checkRole} = require("./middleware/authMiddleware.js")
+const upload = require("./middleware/multerConfig.js")
 async function main() {
   await mongoose.connect(dbUrl);
 }
@@ -26,6 +27,7 @@ main()
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+app.use("/uploads", express.static("uploads"))
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.engine("ejs", ejsMate);
@@ -119,19 +121,19 @@ app.post("/login", async (req, res) => {
       expiresIn: "1d",
     });
 
-    res.status(200).json({
-      success: true,
-      token,
-      id: isExist._id,
-      role: isExist.role
-    });
-
-    // res.cookie("token", token, {
-    //   httpOnly: true, // JS access nahi kar sakta (secure)
-    //   maxAge: 24 * 60 * 60 * 1000, // 1 day
+    // res.status(200).json({
+    //   success: true,
+    //   token,
+    //   id: isExist._id,
+    //   role: isExist.role
     // });
 
-    // res.redirect("/profile");
+    res.cookie("token", token, {
+      httpOnly: true, // JS access nahi kar sakta (secure)
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
+    res.redirect("/upload");
   } catch (err) {
     throw new AppError(err.message, 500);
   }
@@ -163,6 +165,24 @@ app.get("/user/dashboard", protectByHeader, checkRole("user"), async (req, res) 
     user: userData,
   });
 });
+
+app.get("/upload", protectByCookie, (req, res) => {
+  res.render("./upload.ejs")
+})
+
+app.post("/uploads", protectByCookie, upload.single("image"), (req, res) => {
+    if(!req.file) {
+      return res.status(401).json({
+        success: false, message: "No file uploaded!"
+      })
+    }
+    res.status(200).json({
+        success: true,
+        message: "file uploaded",
+        file: req.file.filename,
+        path: req.file.path
+      })
+})
 
 app.listen(port, () => {
   console.log(`Sever is listening at port ${port}`);

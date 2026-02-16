@@ -8,4 +8,10 @@ class AppError extends Error {
   }
 };
 
-module.exports = AppError
+class MulterError extends Error {
+  constructor(message) {
+    super(message)
+  }
+}
+
+module.exports = {AppError, MulterError}
