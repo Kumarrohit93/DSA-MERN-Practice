@@ -7,11 +7,15 @@ const bcrypt = require("bcryptjs");
 const path = require("path");
 const dbUrl = "mongodb://127.0.0.1:27017/backendPractice";
 const ejsMate = require("ejs-mate");
-const {AppError} = require("./middleware/AppError.js");
+const { AppError } = require("./middleware/AppError.js");
 const jwt_secret = "123456788054654";
 const cookieParser = require("cookie-parser");
-const {protectByHeader, protectByCookie, checkRole} = require("./middleware/authMiddleware.js")
-const upload = require("./middleware/multerConfig.js")
+const {
+  protectByHeader,
+  protectByCookie,
+  checkRole,
+} = require("./middleware/authMiddleware.js");
+const upload = require("./middleware/multerConfig.js");
 async function main() {
   await mongoose.connect(dbUrl);
 }
@@ -27,7 +31,7 @@ main()
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
-app.use("/uploads", express.static("uploads"))
+app.use("/uploads", express.static("uploads"));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.engine("ejs", ejsMate);
@@ -47,8 +51,8 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ["user", "admin"],
-    required: true
-  }
+    required: true,
+  },
 });
 
 const user = mongoose.model("user", userSchema);
@@ -117,9 +121,13 @@ app.post("/login", async (req, res) => {
       throw new AppError("Wrong password", 400);
     }
 
-    const token = jwt.sign({ id: isExist._id, role: isExist.role }, jwt_secret, {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign(
+      { id: isExist._id, role: isExist.role },
+      jwt_secret,
+      {
+        expiresIn: "1d",
+      },
+    );
 
     // res.status(200).json({
     //   success: true,
@@ -148,41 +156,68 @@ app.get("/profile", protectByHeader, checkRole("user"), async (req, res) => {
   });
 });
 
-app.get("/admin/allusers", protectByHeader, checkRole("admin"), async (req, res) => {
-  const userData = await user.findById(req.user.id);
+app.get(
+  "/admin/allusers",
+  protectByHeader,
+  checkRole("admin"),
+  async (req, res) => {
+    const userData = await user.findById(req.user.id);
 
-  res.json({
-    success: true,
-    user: userData,
-  });
-});
+    res.json({
+      success: true,
+      user: userData,
+    });
+  },
+);
 
-app.get("/user/dashboard", protectByHeader, checkRole("user"), async (req, res) => {
-  const userData = await user.findById(req.user.id);
+app.get(
+  "/user/dashboard",
+  protectByHeader,
+  checkRole("user"),
+  async (req, res) => {
+    const userData = await user.findById(req.user.id);
 
-  res.json({
-    success: true,
-    user: userData,
-  });
-});
+    res.json({
+      success: true,
+      user: userData,
+    });
+  },
+);
 
 app.get("/upload", protectByCookie, (req, res) => {
-  res.render("./upload.ejs")
-})
+  res.render("./upload.ejs");
+});
 
 app.post("/uploads", protectByCookie, upload.single("image"), (req, res) => {
-    if(!req.file) {
-      return res.status(401).json({
-        success: false, message: "No file uploaded!"
-      })
-    }
-    res.status(200).json({
-        success: true,
-        message: "file uploaded",
-        file: req.file.filename,
-        path: req.file.path
-      })
-})
+  if (!req.file) {
+    return res.status(401).json({
+      success: false,
+      message: "No file uploaded!",
+    });
+  }
+  res.status(200).json({
+    success: true,
+    message: "file uploaded",
+    file: req.file.filename,
+    path: req.file.path,
+  });
+});
+
+app.get("/allusers", async (req, res) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 3;
+
+  const skip = (page - 1) * limit;
+  const totalUsers = await user.countDocuments();
+  const users = await user.find({}).skip(skip).limit(limit);
+  res.json({
+    message: "Success",
+    pageNo: page,
+    limitOnPerPage: limit,
+    total: totalUsers,
+    allUsers: users,
+  });
+});
 
 app.listen(port, () => {
   console.log(`Sever is listening at port ${port}`);
