@@ -6,6 +6,8 @@ const dbUrl = "mongodb://127.0.0.1:27017/backendPractice";
 const AppError = require("./CustomeErrors/Error.js");
 const errorHandler = require("./Middleware/errorHandler.js");
 const catchAsync = require("./Middleware/asyncHandler.js");
+const data = require("./data.js")
+
 async function main() {
   await mongoose.connect(dbUrl);
 }
@@ -27,7 +29,7 @@ const userSchema = new mongoose.Schema({
   },
   age: {
     type: Number,
-    min: 18,
+    min: 1,
     max: 100,
     required: true,
   },
@@ -65,6 +67,13 @@ app.post(
     });
   }),
 );
+
+async function createData() {
+    await user.insertMany(data)
+    console.log("data is initialized")
+}
+
+createData()
 
 app.use(errorHandler);
 

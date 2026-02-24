@@ -219,6 +219,12 @@ app.get("/allusers", async (req, res) => {
   });
 });
 
+app.get("/allData", async(req, res) => {
+  const data = await user.find({})
+  console.log(data[0])
+  res.json({data})
+})
+
 app.listen(port, () => {
   console.log(`Sever is listening at port ${port}`);
 });
