@@ -1,19 +1,12 @@
 import React from "react";
-
+import Card from "./Compomnents/card.jsx"
+import Navbar from "./Compomnents/Navbar.jsx";
 const App = () => {
   return (
-    <>
-      <div>
-        <h1>Hello</h1>
-        <h2>Hello</h2>
-        <h3>Hello</h3>
-        <h4>Hello</h4>
-        <h5>Hello</h5>
-      </div>
-      <div id="Chacha">
-
-      </div>
-    </>
+    <div>
+      <Navbar/>
+      <Card/>
+    </div>
   );
 };
 
